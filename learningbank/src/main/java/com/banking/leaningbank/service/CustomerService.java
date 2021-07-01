@@ -95,32 +95,38 @@ public class CustomerService {
 			if(balance < transfer.getAmount()) {
 				throw new InsufficientBalanceException("inSufficient Balance");
 			}
-			Double updatedAmount =  this.fundTransferFromAccount(balance,transfer.getAmount());
-			//if(transferFlag) {
+			Double updatedAmount =  this.fundTransferFromAccount(balance,transfer.getAmount(),transfer.getCustomerId());
+			if(updatedAmount != null) {
 				return new FundTransfer(transfer.getCustomerId(),transfer.getBeneficiaryName(),
 						transfer.getBeneficiaryId(),transfer.getAmount(),updatedAmount,"Successfully transfered to beneficiary",
 						 LocalDate.now());
 						
-			//}
+			}
 		}
 		else {
 			throw new BeneficiaryNotFoundException("beneficiary not found for this customer");
 		}
-		
+		return new FundTransfer(transfer.getCustomerId(),transfer.getBeneficiaryName(),
+				transfer.getBeneficiaryId(),transfer.getAmount(),00.0,"error occured while transfer",
+				 LocalDate.now());
 	}
 	
-	private synchronized Double fundTransferFromAccount(Double balance, Double transactionAmount) {
+	private synchronized Double fundTransferFromAccount(Double balance, Double transactionAmount, Integer custId) {
 		Double updatedBalance = (balance - transactionAmount);
-		Customer customer = new Customer();
 		
 		try {
-		customer.setAccountBalance(updatedBalance);
-		Customer updatedCust = custRepo.save(customer);
-		return updatedCust.getAccountBalance();
+		java.util.Optional<Customer> customer = custRepo.findById(custId);
+		if(customer.isPresent()) {
+			Customer c = customer.get();
+			c.setAccountBalance(updatedBalance);
+			custRepo.save(c);
+			}	 
+		
+		return updatedBalance;
 		} catch (Exception e) {
-			logger.info("error updating balance");
+			logger.error("error updating balance {}",e.getMessage());
 		}
-		return customer.getAccountBalance();
+		return null;
 	}
 
 
