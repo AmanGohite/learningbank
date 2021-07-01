@@ -51,7 +51,7 @@ public class CustomerService {
 			flag=true;
 			return flag;
 		}catch (Exception e) {
-			logger.error("error adding customer");
+			logger.error("error adding customer {}",e.getMessage());
 		}
 		return flag;
 	}
@@ -70,7 +70,7 @@ public class CustomerService {
 				}
 
 		}catch (Exception e) {
-			logger.error("error retreiving Customer with email {}",customer.getEmail());
+			logger.error("error retreiving Customer with email {}",e.getMessage());
 		}
 		return custMod;
 	}
@@ -82,7 +82,7 @@ public class CustomerService {
 			benelist =  benfRepo.findByCustomerId(customerId);
 			return benelist;
 		}catch (Exception e) {
-			logger.info("error retreiving beneficiary list");
+			logger.info("error retreiving beneficiary list {}",e.getMessage());
 		}
 		return benelist;
 	}
@@ -139,7 +139,7 @@ public class CustomerService {
 			}
 			return true;
 		}catch (Exception e) {
-			logger.error("error validating beneficiary");
+			logger.error("error validating beneficiary {}",e.getMessage());
 		}
 			return isValidTransaction;
 	}
@@ -153,7 +153,7 @@ public class CustomerService {
 				return	customer.get().getAccountBalance();
 			}	 
 		}catch (Exception e) {
-			logger.error("error getting account balance");
+			logger.error("error getting account balance {}",e.getMessage());
 		}
 		return null;
 	}
