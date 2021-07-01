@@ -4,6 +4,7 @@ import java.util.Date;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,19 +24,27 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
   }
 
   @ExceptionHandler(CustomerNotFoundException.class)
-  public final ResponseEntity<Object> handleUserNotFoundException(CustomerNotFoundException ex, WebRequest request) {
+  public final ResponseEntity<Object> handleCustomerNotFoundException(CustomerNotFoundException ex, WebRequest request) {
     ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(),
         request.getDescription(false));
     return new ResponseEntity(errorDetails, HttpStatus.NOT_FOUND);
   }
   
   @ExceptionHandler(BeneficiaryNotFoundException.class)
-  public final ResponseEntity<Object> handleUserNotFoundException(BeneficiaryNotFoundException ex, WebRequest request) {
+  public final ResponseEntity<Object> handleBeneficiaryNotFoundException(BeneficiaryNotFoundException ex, WebRequest request) {
+    ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(),
+        request.getDescription(false));
+    return new ResponseEntity(errorDetails, HttpStatus.NOT_FOUND);
+  }
+  
+  @ExceptionHandler(InsufficientBalanceException.class)
+  public final ResponseEntity<Object> handleInsufficientBalNotFoundException(InsufficientBalanceException ex, WebRequest request) {
     ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(),
         request.getDescription(false));
     return new ResponseEntity(errorDetails, HttpStatus.NOT_FOUND);
   }
 
+  
   @Override
   protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
       HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -43,4 +52,6 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         ex.getBindingResult().toString());
     return new ResponseEntity(errorDetails, status.BAD_REQUEST);
   } 
+  
+  
 }

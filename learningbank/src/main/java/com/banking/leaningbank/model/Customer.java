@@ -9,6 +9,7 @@ import javax.persistence.Id;
 
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -27,16 +28,15 @@ public class Customer {
 	private Integer customerId;
 	
 	@Column(name="cust_name")
-	@NotNull(message="Customer Name cannot be blank")
 	@Size(message="Customer name should be between 2 to 25 chars")
+	@NotBlank(message="name cannot be blank")
 	private String customerName;
 	
-	@NotNull(message="password cannot be null")
+	@NotBlank(message="password cannot be null")
 	@JsonProperty(access = Access.WRITE_ONLY)
 	private String password;
 	
 	@Column(name="account_bal")
-	@NotNull(message="account balance cannot be null")
 	private Double accountBalance;
 	
 	
