@@ -3,6 +3,7 @@ package com.banking.leaningbank.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.banking.leaningbank.exception.BeneficiaryNotFoundException;
 import com.banking.leaningbank.exception.InsufficientBalanceException;
+import com.banking.leaningbank.model.Account;
 import com.banking.leaningbank.model.Beneficiary;
 import com.banking.leaningbank.model.Customer;
 import com.banking.leaningbank.model.CustomerLogin;
@@ -21,6 +23,7 @@ import com.banking.leaningbank.model.CustomerModel;
 import com.banking.leaningbank.model.FundTransfer;
 import com.banking.leaningbank.model.Transaction;
 import com.banking.leaningbank.model.TransferRequest;
+import com.banking.leaningbank.repository.AccountRepository;
 import com.banking.leaningbank.repository.BeneficiaryRepository;
 import com.banking.leaningbank.repository.CustomerRepository;
 import com.banking.leaningbank.repository.TransactionRepository;
@@ -41,20 +44,30 @@ public class CustomerService {
 	@Autowired
 	TransactionRepository tranRepo;
 	
+	@Autowired
+	AccountRepository accountRepo;
 	
-	public Boolean addCustomer(Customer customer) {
-		boolean flag=false;
+	public String addCustomer(Customer customer) {
+		String flag="";
 		try {
-			customer.setAccountNo("DEMO"+customer.getAccountBalance().intValue()+"1234");
-			Customer cust =custRepo.save(customer);
-			List<Beneficiary> beneficiaryList = new ArrayList();
-			beneficiaryList.add(new Beneficiary( cust.getCustomerId(), "Beneficiary1", LocalDate.now()));
-			beneficiaryList.add(new Beneficiary( cust.getCustomerId(), "Beneficiary2", LocalDate.now()));
+				Customer isvalidCust = custRepo.findByEmail(customer.getEmail());
+				if(isvalidCust == null) {
+				customer.setPassword(generateString());
 			
-			beneficiaryList.forEach(b->benfRepo.save(b));
+				Customer cust =custRepo.save(customer);
+				List<Beneficiary> beneficiaryList = new ArrayList();
+				beneficiaryList.add(new Beneficiary( cust.getCustomerId(), "Beneficiary1", LocalDate.now()));
+				beneficiaryList.add(new Beneficiary( cust.getCustomerId(), "Beneficiary2", LocalDate.now()));
+				
+				beneficiaryList.forEach(b->benfRepo.save(b));
+				accountRepo.save(new Account(cust.getCustomerId(),
+						"DEMOBANK000"+cust.getCustomerId()
+						, customer.getInitialBalance()));
+
+				flag=cust.getPassword();
+				return flag;
+				}
 			
-			flag=true;
-			return flag;
 		}catch (Exception e) {
 			logger.error("error adding customer {}",e.getMessage());
 		}
@@ -68,8 +81,10 @@ public class CustomerService {
 			
 			Customer cust = custRepo.findByEmailAndPassword(customer.getEmail(),customer.getPassword());
 				if (cust != null) {
+					Account account = accountRepo.findByCustomerId(cust.getCustomerId());
+					
 					 custMod = new CustomerModel(cust.getCustomerId(), cust.getCustomerName(),
-							cust.getAccountBalance(), cust.getEmail(),cust.getAccountNo(), this.getBeneficiary(cust.getCustomerId()));
+							account,cust.getEmail() ,this.getBeneficiary(cust.getCustomerId()));
 
 					return custMod;
 				}
@@ -123,11 +138,11 @@ public class CustomerService {
 		Double updatedBalance = (balance - transactionAmount);
 		
 		try {
-		java.util.Optional<Customer> customer = custRepo.findById(custId);
-		if(customer.isPresent()) {
-			Customer c = customer.get();
-			c.setAccountBalance(updatedBalance);
-			custRepo.save(c);
+		Account a = accountRepo.findByCustomerId(custId);
+		if(a != null) {
+			
+			a.setAccountBalance(updatedBalance);
+			accountRepo.save(a);
 			}	 
 		
 		return updatedBalance;
@@ -156,9 +171,9 @@ public class CustomerService {
 
 	private Double getAccountBalance(Integer customerId) {
 		try {
-			java.util.Optional<Customer> customer = custRepo.findById(customerId);
-			if(customer.isPresent()) {
-				return	customer.get().getAccountBalance();
+			Account account = accountRepo.findByCustomerId(customerId);
+			if(account != null) {
+				return	account.getAccountBalance();
 			}	 
 		}catch (Exception e) {
 			logger.error("error getting account balance {}",e.getMessage());
@@ -191,5 +206,10 @@ public class CustomerService {
 		}
 	return flag;
 	}
+	
+	  public static String generateString() {
+	        String password = UUID.randomUUID().toString();
+	        return password.replace("-", "").substring(0, 10);
+	    }
 		
 }

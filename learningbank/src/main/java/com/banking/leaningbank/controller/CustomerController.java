@@ -14,6 +14,7 @@ import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,13 +51,13 @@ public class CustomerController {
 	public ResponseEntity<Map<String,String>> addCustomer(@RequestBody @Valid Customer customer, UriComponentsBuilder builder) {
 		String json = new Gson().toJson(customer);
 		logger.info("request received for adding customer {}", json);
-		Boolean flag = custService.addCustomer(customer);
+		String flag = custService.addCustomer(customer);
 		Map<String, String> responseText = new HashMap();
-		if (flag == false) {
+		if (StringUtils.isEmpty(flag)) {
 			responseText.put("response", "error occured while adding new customer");
 			return new ResponseEntity<Map<String,String>>(responseText,HttpStatus.CONFLICT);
 		}
-		responseText.put("response", "Customer suggesfully registered, Please proceed to login with email and password");
+		responseText.put("response", "Customer suggesfully registered, Please proceed to login with email and password as "+flag);
 		logger.info("request end for adding customer {}", json);
 		return new ResponseEntity<Map<String,String>>(responseText, HttpStatus.CREATED);
 

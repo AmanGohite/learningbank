@@ -1,13 +1,17 @@
 package com.banking.leaningbank.model;
 
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -32,29 +36,21 @@ public class Customer {
 	@NotBlank(message="name cannot be blank")
 	private String customerName;
 	
-	@NotBlank(message="password cannot be null")
 	@JsonProperty(access = Access.WRITE_ONLY)
 	private String password;
 	
-	@Column(name="account_bal")
-	private Double accountBalance;
+	@Transient
+	private Double initialBalance;
 	
 	
 	@Email(message="email should be in proper format")
 	private String email;
 	
-	@Column(name="account_no")
-	private String accountNo;
+	
 
 	
 	
-	public String getAccountNo() {
-		return accountNo;
-	}
-
-	public void setAccountNo(String accountNo) {
-		this.accountNo = accountNo;
-	}
+	
 
 	public Integer getCustomerId() {
 		return customerId;
@@ -80,12 +76,16 @@ public class Customer {
 		this.password = password;
 	}
 
-	public Double getAccountBalance() {
-		return accountBalance;
+	
+
+	
+
+	public Double getInitialBalance() {
+		return initialBalance;
 	}
 
-	public void setAccountBalance(Double accountBalance) {
-		this.accountBalance = accountBalance;
+	public void setInitialBalance(Double initialBalance) {
+		this.initialBalance = initialBalance;
 	}
 
 	public String getEmail() {

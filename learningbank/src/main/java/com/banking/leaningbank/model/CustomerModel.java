@@ -7,20 +7,18 @@ public class CustomerModel {
 	
 	private Integer customerId;
 	private String customerName;
-	private Double accountBalance;
-	private String accountNo;
+	private Account accountDetails;
 	private String email;
 	private List<Beneficiary> beneficiaryList;
 	
 	
-	public CustomerModel(Integer customerId, String customerName, Double accountBalance, String email,String accountNo,
+	public CustomerModel(Integer customerId, String customerName,Account accountDetails , String email,
 			List<Beneficiary> beneficiaryList) {
 		super();
 		this.customerId = customerId;
 		this.customerName = customerName;
-		this.accountBalance = accountBalance;
+		this.accountDetails = accountDetails;
 		this.email = email;
-		this.accountNo = accountNo;
 		this.beneficiaryList = beneficiaryList;
 	}
 	
@@ -28,16 +26,6 @@ public class CustomerModel {
 	public CustomerModel() {};
 	
 	
-
-	public String getAccountNo() {
-		return accountNo;
-	}
-
-
-	public void setAccountNo(String accountNo) {
-		this.accountNo = accountNo;
-	}
-
 
 	public Integer getCustomerId() {
 		return customerId;
@@ -56,14 +44,17 @@ public class CustomerModel {
 	}
 
 
+	
 
-	public Double getAccountBalance() {
-		return accountBalance;
+	public Account getAccountDetails() {
+		return accountDetails;
 	}
 
-	public void setAccountBalance(Double accountBalance) {
-		this.accountBalance = accountBalance;
+
+	public void setAccountDetails(Account accountDetails) {
+		this.accountDetails = accountDetails;
 	}
+
 
 	public String getEmail() {
 		return email;
