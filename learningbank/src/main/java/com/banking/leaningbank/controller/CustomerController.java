@@ -1,5 +1,6 @@
 package com.banking.leaningbank.controller;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,9 +14,11 @@ import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,7 +56,7 @@ public class CustomerController {
 			responseText.put("response", "error occured while adding new customer");
 			return new ResponseEntity<Map<String,String>>(responseText,HttpStatus.CONFLICT);
 		}
-		responseText.put("response", "Customer suggesfully registered, Please proceed to login");
+		responseText.put("response", "Customer suggesfully registered, Please proceed to login with email and password");
 		logger.info("request end for adding customer {}", json);
 		return new ResponseEntity<Map<String,String>>(responseText, HttpStatus.CREATED);
 
@@ -83,4 +86,28 @@ public class CustomerController {
 		return new ResponseEntity<FundTransfer>(fund,HttpStatus.OK);
 		
 	}
+	
+	@DeleteMapping(value="/{beneficiary}")
+	public ResponseEntity<Void> deleteBeneficiary(@PathVariable("beneficiary") Integer beneficiaryId){
+		boolean flag = custService.deleteBeneficiary(beneficiaryId);
+		if(flag) {
+		return new ResponseEntity<Void>(HttpStatus.OK);
+		}
+		return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	
+	@PostMapping(value="/beneficiary")
+	public ResponseEntity<Void> updateBeneficiary(Beneficiary beneficiary){
+		beneficiary.setDateAdded(LocalDate.now());
+		boolean flag = custService.updateBeneficiary(beneficiary);
+		if(flag) {
+			return new ResponseEntity<Void>( HttpStatus.OK);
+
+		}
+		return new ResponseEntity<Void>( HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
+	
 }

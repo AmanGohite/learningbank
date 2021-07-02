@@ -8,23 +8,36 @@ public class CustomerModel {
 	private Integer customerId;
 	private String customerName;
 	private Double accountBalance;
+	private String accountNo;
 	private String email;
 	private List<Beneficiary> beneficiaryList;
 	
 	
-	public CustomerModel(Integer customerId, String customerName, Double accountBalance, String email,
+	public CustomerModel(Integer customerId, String customerName, Double accountBalance, String email,String accountNo,
 			List<Beneficiary> beneficiaryList) {
 		super();
 		this.customerId = customerId;
 		this.customerName = customerName;
 		this.accountBalance = accountBalance;
 		this.email = email;
+		this.accountNo = accountNo;
 		this.beneficiaryList = beneficiaryList;
 	}
 	
 	
 	public CustomerModel() {};
 	
+	
+
+	public String getAccountNo() {
+		return accountNo;
+	}
+
+
+	public void setAccountNo(String accountNo) {
+		this.accountNo = accountNo;
+	}
+
 
 	public Integer getCustomerId() {
 		return customerId;

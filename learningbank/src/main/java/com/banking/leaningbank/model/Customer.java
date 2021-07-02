@@ -43,7 +43,18 @@ public class Customer {
 	@Email(message="email should be in proper format")
 	private String email;
 	
+	@Column(name="account_no")
+	private String accountNo;
+
 	
+	
+	public String getAccountNo() {
+		return accountNo;
+	}
+
+	public void setAccountNo(String accountNo) {
+		this.accountNo = accountNo;
+	}
 
 	public Integer getCustomerId() {
 		return customerId;

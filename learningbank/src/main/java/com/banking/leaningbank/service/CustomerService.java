@@ -19,9 +19,11 @@ import com.banking.leaningbank.model.Customer;
 import com.banking.leaningbank.model.CustomerLogin;
 import com.banking.leaningbank.model.CustomerModel;
 import com.banking.leaningbank.model.FundTransfer;
+import com.banking.leaningbank.model.Transaction;
 import com.banking.leaningbank.model.TransferRequest;
 import com.banking.leaningbank.repository.BeneficiaryRepository;
 import com.banking.leaningbank.repository.CustomerRepository;
+import com.banking.leaningbank.repository.TransactionRepository;
 import com.google.common.base.Optional;
 
 @Service
@@ -36,11 +38,14 @@ public class CustomerService {
 	@Autowired
 	BeneficiaryRepository benfRepo;
 	
+	@Autowired
+	TransactionRepository tranRepo;
+	
 	
 	public Boolean addCustomer(Customer customer) {
 		boolean flag=false;
 		try {
-			
+			customer.setAccountNo("DEMO"+customer.getAccountBalance().intValue()+"1234");
 			Customer cust =custRepo.save(customer);
 			List<Beneficiary> beneficiaryList = new ArrayList();
 			beneficiaryList.add(new Beneficiary( cust.getCustomerId(), "Beneficiary1", LocalDate.now()));
@@ -64,7 +69,7 @@ public class CustomerService {
 			Customer cust = custRepo.findByEmailAndPassword(customer.getEmail(),customer.getPassword());
 				if (cust != null) {
 					 custMod = new CustomerModel(cust.getCustomerId(), cust.getCustomerName(),
-							cust.getAccountBalance(), cust.getEmail(), this.getBeneficiary(cust.getCustomerId()));
+							cust.getAccountBalance(), cust.getEmail(),cust.getAccountNo(), this.getBeneficiary(cust.getCustomerId()));
 
 					return custMod;
 				}
@@ -97,6 +102,9 @@ public class CustomerService {
 			}
 			Double updatedAmount =  this.fundTransferFromAccount(balance,transfer.getAmount(),transfer.getCustomerId());
 			if(updatedAmount != null) {
+				
+				tranRepo.save(new Transaction(transfer.getAmount(), transfer.getCustomerId(), transfer.getBeneficiaryId()));
+				
 				return new FundTransfer(transfer.getCustomerId(),transfer.getBeneficiaryName(),
 						transfer.getBeneficiaryId(),transfer.getAmount(),updatedAmount,"Successfully transfered to beneficiary",
 						 LocalDate.now());
@@ -156,6 +164,32 @@ public class CustomerService {
 			logger.error("error getting account balance {}",e.getMessage());
 		}
 		return null;
+	}
+
+
+	public boolean deleteBeneficiary(Integer beneficiaryId) {
+		boolean flag=false;
+		try {
+			benfRepo.deleteById(beneficiaryId);
+			flag=true;
+			return flag;
+		}catch (Exception e) {
+			logger.error("error deleting beneficiary {}",e.getMessage());
+		}
+	return flag;
+	}
+
+
+	public boolean updateBeneficiary(Beneficiary beneficiary) {
+		boolean flag=false;
+		try {
+			benfRepo.save(beneficiary);
+			flag=true;
+			return flag;
+		}catch (Exception e) {
+			logger.error("error modifying beneficiary {}",e.getMessage());
+		}
+	return flag;
 	}
 		
 }
