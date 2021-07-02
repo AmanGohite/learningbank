@@ -72,7 +72,7 @@ public class CustomerService {
 		}catch (Exception e) {
 			logger.error("error retreiving Customer with email {}",e.getMessage());
 		}
-		return custMod;
+		return null;
 	}
 
 
